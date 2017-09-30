@@ -35,7 +35,6 @@ function start()
     $("#section3").append(choice3);
     var choice4 = $('<input/>').attr({type:'button', id:'choice4', index:'0', class:'choice', value:'choice4'});
     $("#section4").append(choice4);
-
     gotoNextQuestion();
 }
 
@@ -47,7 +46,6 @@ $(document).on("click", ".choice", function(){
 
     clearTimeout(pauseTimerId);
     clearInterval(intervalTimerId);
-    hideButtons();
 
     var userChoice = this.value;
     console.log(userChoice);
@@ -56,6 +54,8 @@ $(document).on("click", ".choice", function(){
     console.log(index);
     
     var trivia = infoSource.trivia[index];
+
+    hideButtons();
     
     if (trivia.answer[0] === userChoice[0])
     {
@@ -84,10 +84,9 @@ function gotoNextQuestion()
  
 
     if (questionCounter)
-    {        
-        $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
-
+    {
         secondsCounter=30;
+        $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
         questionCounter--;
 
         var index = generateNextRandom();
@@ -100,8 +99,7 @@ function gotoNextQuestion()
         $("#choice3").attr("value", trivia.choice3);
         $("#choice4").attr("value", trivia.choice4);
 
-        intervalTimerId = setInterval(function() 
-        {
+        intervalTimerId = setInterval(function() {
             secondsCounter--;
             $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
 
@@ -148,8 +146,7 @@ function displayFinalResults()
     $("#question").html("All done, here is how you did!");
     $(".container").append('<h4 id="rightAnswer"></h4>');
     $(".container").append('<h4 id="wrongAnswer"></h4>');
-    $(".container").append('<h4 id="noAnswer"></h4>');  
-      
+    $(".container").append('<h4 id="noAnswer"></h4>');    
     var startOver = $('<input/>').attr({type:'button', id:'refresh', onClick:'start()', value:'Start Over?'});
     $("#noAnswer").after(startOver);
 
@@ -193,7 +190,6 @@ function generateNextRandom()
     }
     return randomIndex;
 }
-
 
 //=================================================
 //                  hideButtons()

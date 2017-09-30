@@ -6,8 +6,7 @@ var rightCounter=0;
 var wrongCounter=0;
 var noAnswerCounter=0;
 var indexList = [];
-var timerId=0;
-var timerId2=0;
+var pauseTimerId=0;
 var intervalTimerId=0;
 var secondsCounter=30;
 
@@ -45,7 +44,7 @@ function start()
 //====================================================================
 $(document).on("click", ".choice", function(){
 
-    clearTimeout(timerId);
+    clearTimeout(pauseTimerId);
     clearInterval(intervalTimerId);
 
     var userChoice = this.value;
@@ -69,7 +68,7 @@ $(document).on("click", ".choice", function(){
         wrongCounter++;
     }
 
-    timerId2 = setTimeout(gotoNextQuestion, 5000);
+    puaseTimerId = setTimeout(gotoNextQuestion, 5000);
 });
 
 //====================================================================
@@ -99,11 +98,14 @@ function gotoNextQuestion()
         $("#choice2").attr("value", trivia.choice2);
         $("#choice3").attr("value", trivia.choice3);
         $("#choice4").attr("value", trivia.choice4);
-        intervalTimerId = setInterval(updateIntervalTimer, 1000);
 
-        timerId = setTimeout(function(){
+        intervalTimerId = setInterval(function() {
+            secondsCounter--;
+            $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
 
-                clearTimeout(timerId2);
+            if (secondsCounter === 0)
+            {
+                clearTimeout(pauseTimerId);
                 clearInterval(intervalTimerId);
                 $("#timer").html("Time Remaining: 0 Seconds");
                 hideButtons();
@@ -113,8 +115,9 @@ function gotoNextQuestion()
                 noAnswerCounter++;
                 var trivia = infoSource.trivia[index];
                 $("#answer").html("TIME OUT!! The correct answer was: "+ trivia.answer.substr(2));
-                timerId2 = setTimeout(gotoNextQuestion, 5000);
-            }, 30000);
+                pauseTimerId = setTimeout(gotoNextQuestion, 5000);
+            }
+        }, 1000);
     }
     else
     {
@@ -129,8 +132,8 @@ function gotoNextQuestion()
 
 function displayFinalResults()
 {
-    clearTimeout(timerId);
-    clearTimeout(timerId2);
+    clearTimeout(pauseTimerId);
+    clearTimeout(intervalTimerId);
 
     console.log("displayFinalResults()");
     
@@ -195,7 +198,21 @@ function updateIntervalTimer()
 {
     secondsCounter--;
     $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
-    //secondsCounter--;
+
+    if (secondsCounter === 0)
+    {
+        clearTimeout(pauseTimerId);
+        clearInterval(intervalTimerId);
+        $("#timer").html("Time Remaining: 0 Seconds");
+        hideButtons();
+
+        console.log("timerExpired()");
+
+        noAnswerCounter++;
+        var trivia = infoSource.trivia[index];
+        $("#answer").html("TIME OUT!! The correct answer was: "+ trivia.answer.substr(2));
+        pauseTimerId = setTimeout(gotoNextQuestion, 5000);
+    }
 }  
 
 

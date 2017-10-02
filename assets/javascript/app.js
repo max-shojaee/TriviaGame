@@ -9,20 +9,28 @@ var indexList = [];
 var pauseTimerId=0;
 var intervalTimerId=0;
 var secondsCounter=30;
+var soundtrack=null;
+
+$(document).ready (function(){
+    soundtrack = document.getElementById("soundtrack"); 
+    soundtrack.play();
+})
 
 //====================================================================
-//  start() gets called when the user presses the start button.
+//  start() gets called each time the game starts.
 //====================================================================
-
 function start()
 {
     console.log("start()");
 
+    // Append all the fields
+
     $(".container").empty();
+    $(".container").append('<h1><strong>TOTALLY TRIVIAL TRIVIA!</strong></h1>')
     $(".container").append('<h3 id="timer"></h3>');
-    $("#timer").append('<h3 id="clock"></h3>');
     $(".container").append('<h3 id="question"></h3>');
     $(".container").append('<h3 id="answer"></h3>');
+    $(".container").append('<h3 id="answer2"></h3>');
     $(".container").append('<div id="section1"></div>');
     $(".container").append('<div id="section2"></div>');
     $(".container").append('<div id="section3"></div>');
@@ -35,39 +43,51 @@ function start()
     $("#section3").append(choice3);
     var choice4 = $('<input/>').attr({type:'button', id:'choice4', index:'0', class:'choice', value:'choice4'});
     $("#section4").append(choice4);
+
+    // Start the trivia
+    soundtrack.pause();
     gotoNextQuestion();
 }
 
 
 //====================================================================
-//  User choice clicks are processed here.
+//  User clicks are processed here.
 //====================================================================
 $(document).on("click", ".choice", function(){
 
+    // Stop all timers
     clearTimeout(pauseTimerId);
     clearInterval(intervalTimerId);
 
+    // hide the answers 
+    hideButtons();
+
+    // Get user's choice
     var userChoice = this.value;
     console.log(userChoice);
     
     var index = this.getAttribute("index");
     console.log(index);
     
+    // Look up the choice in the trivia table
     var trivia = infoSource.trivia[index];
 
-    hideButtons();
-    
+
+    // validate answer and display result
     if (trivia.answer[0] === userChoice[0])
     {
-        $("#answer").html("Correct!! "+ trivia.answer.substr(2));
+        $("#answer").html("Correct!!");
+        $("#answer2").html(trivia.answer.substr(2));
         rightCounter++;
     }
     else
     {
-        $("#answer").html("Sorry, the correct answer was: "+ trivia.answer.substr(2));
+        $("#answer").html("Sorry!");
+        $("#answer2").html("The correct answer was: "+ trivia.answer.substr(2));
         wrongCounter++;
     }
 
+    // pause 5 seconds before the next question
     puaseTimerId = setTimeout(gotoNextQuestion, 5000);
 });
 
@@ -79,19 +99,25 @@ function gotoNextQuestion()
 {
     console.log("goToNextQuestion()");
 
+    // clear the answers and show the possible choices for next question
     showButtons();
     $("#answer").html("");
- 
+    $("#answer2").html("");
 
+    // if still less than 10 questions
     if (questionCounter)
     {
+        // set the 30 second timer
         secondsCounter=30;
         $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
+
         questionCounter--;
 
+        // pick a unique random question
         var index = generateNextRandom();
         var trivia = infoSource.trivia[index];
 
+        //display the question and answer choices
         $("#question").html(trivia.question);
         $(".choice").attr("index", index);
         $("#choice1").attr("value", trivia.choice1);
@@ -99,10 +125,14 @@ function gotoNextQuestion()
         $("#choice3").attr("value", trivia.choice3);
         $("#choice4").attr("value", trivia.choice4);
 
+        // start the 1 second interval timer and process the timeout here
         intervalTimerId = setInterval(function() {
+
+            // decrement the seconds when the timer goes off
             secondsCounter--;
             $("#timer").html("Time Remaining: "+secondsCounter+" Seconds");
 
+            // if time is up, display "Timeout!" and the correct answer 
             if (secondsCounter === 0)
             {
                 clearTimeout(pauseTimerId);
@@ -114,13 +144,16 @@ function gotoNextQuestion()
 
                 noAnswerCounter++;
                 var trivia = infoSource.trivia[index];
-                $("#answer").html("TIME OUT!! The correct answer was: "+ trivia.answer.substr(2));
+                $("#answer").html("TIME OUT!");
+                $("#answer2").html("The answer was: "+ trivia.answer.substr(2));
+
+                //go to the next question
                 pauseTimerId = setTimeout(gotoNextQuestion, 5000);
             }
         }, 1000);
     }
     else
-    {
+    {   // After 10 questions have been selected, display the final results
         displayFinalResults();
     }
 }
@@ -132,12 +165,16 @@ function gotoNextQuestion()
 
 function displayFinalResults()
 {
+    //clear all timers and update the fields as needed to display final results
     clearTimeout(pauseTimerId);
     clearTimeout(intervalTimerId);
 
     console.log("displayFinalResults()");
     
+    soundtrack.play();
+
     $("#answer").remove();
+    $("#answer2").remove();
     $("#choice1").remove();
     $("#choice2").remove();
     $("#choice3").remove();
@@ -151,9 +188,10 @@ function displayFinalResults()
     $("#noAnswer").after(startOver);
 
     $("#rightAnswer").html("Correct Answers: "+rightCounter);
-    $("#wrongAnswer").html("Inorrect Answers: "+wrongCounter); 
+    $("#wrongAnswer").html("Incorrect Answers: "+wrongCounter); 
     $("#noAnswer").html("Unanswered: "+noAnswerCounter);
 
+    // reset all global variables
     questionCounter=10;
     rightCounter=0;
     wrongCounter=0;
@@ -167,6 +205,7 @@ function displayFinalResults()
 
 function generateNextRandom()
 {
+    // generate a unique index between 0 and the length of the trivia table
     var randomIndex = Math.floor((Math.random()* infoSource.trivia.length));
     var searchForRandom = true;
     var i=0;
@@ -197,10 +236,13 @@ function generateNextRandom()
 
 function hideButtons()
 {
+    // hide choices and show the final answer
     $("#choice1").hide();
     $("#choice2").hide();
     $("#choice3").hide();
     $("#choice4").hide();
+    $("#question").after('<h3 id="answer"></h3>');
+    $("#answer").after('<h3 id="answer2"></h3>');
 }
 
 
@@ -210,6 +252,9 @@ function hideButtons()
 
 function showButtons()
 {
+    // remove answer and show new choices to be selected
+    $("#answer").remove();
+    $("#answer2").remove();
     $("#choice1").show();
     $("#choice2").show();
     $("#choice3").show();
@@ -286,7 +331,7 @@ infoSource = {
 },
 {"question":"Which British band had the massive hit Fools Gold?",
 "choice1":"a. The Stone Roses",
-"choice2":"b. Llo   yd Cole and the Commotions",
+"choice2":"b. Lloyd Cole and the Commotions",
 "choice3":"c. Pixies",
 "choice4":"d. Joy Division",
 "answer":"a. The Stone Roses"

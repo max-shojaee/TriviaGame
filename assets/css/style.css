@@ -4,6 +4,7 @@
 
 body{
     background: url('../images/background_img.jpg');
+    background-repeat: repeat;
     font-size: 18px;
     font-family: 'Comic Sans MS','Arial', 'Helvetica Neue', Helvetica, serif;
 }
@@ -28,24 +29,46 @@ h1{
 
 .container{
     background-color: lightgreen;
-    width: 75%;
-    height: 550px;
+    width: 65%;
+    height: 600px;
     position: center;
-    margin-top: 75px;
+    margin-top: 30px;
     margin-bottom: 100px;
+    border: 15px solid hsl(0, 100%, 50%);
+    -webkit-animation: rainbow 5s infinite alternate;
+}
+
+@-webkit-keyframes rainbow {
+  0% {border-color: hsl(0, 100%, 50%);}
+  100% {border-color: hsl(255, 100%, 50%);}
+}
+
+#section1,
+#section2,
+#section3,
+#section4{
+    position: center;
+    text-align: center;
+    align-content: center;
 }
 
 .choice{
     background-color: lightgreen;
-    color: red;
+    color: green;
     position: center;
-    text-align: left;
+    text-align: center;
+    align-content: center;
     border: 0px none;
     margin-top: 10px;
-    margin-left: 20px;
+    font-weight: bold;
+    font-size: 20px;
 }
 .choice:hover {
     background-color: lightblue;
+}
+
+.row{
+       align-content: center;
 }
 
 #question{
@@ -54,10 +77,18 @@ h1{
 
 #answer{
     color:red;
+    text-align: center;
+    font-weight: bold;
+}
+
+#answer2{
+    text-align: center;
+    font-style: italic;
 }
 
 #refresh{
     position: center;
+    align-content: center;
     background-color: yellow;
     color: purple;
     width:45%;
@@ -65,8 +96,8 @@ h1{
     border: 3px solid red;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 700;
-    margin-top: 15%;
+    font-weight: bold;
+    margin-top: 5%;
     margin-left: 27%;
 }
 
@@ -74,12 +105,30 @@ h1{
     background-color: lightblue;
 }
 
-
 #rightAnswer,
 #wrongAnswer,
-#noAnswer,
+#noAnswer
 {
-    padding: 0;
+    margin-top: 2px;
+    font-weight: bold;
+}
+
+#rightAnswer
+{
+    color: green;
+}
+
+#wrongAnswer
+{
     color: red;
-    margin-top: 5px;
+}
+
+#noAnswer
+{
+    color: magenta;
+}
+
+#timer
+{
+    font-weight: bold;
 }
